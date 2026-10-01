@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0; url=dashboard.html">
+    <title>Smart City Noise Pollution Spatial Mapping System</title>
+    <script>
+        // Automatic redirect to dashboard or login
+        if (localStorage.getItem('noise_monitor_admin_session')) {
+            window.location.href = 'dashboard.html';
+        } else {
+            window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body style="background:#0a0e17; color:#fff; font-family:sans-serif; text-align:center; padding-top:20%;">
+    <p>Redirecting to Smart City Noise Dashboard...</p>
+</body>
+</html>

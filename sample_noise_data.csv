@@ -1,0 +1,16 @@
+location_name,zone_type,date,time,noise_level,latitude,longitude,description
+Apollo Super Specialty Hospital,Silence Zone,2026-09-15,10:15,44.2,12.9602,77.5912,Silence zone check outside emergency trauma care unit.
+National Institute of Mental Health,Silence Zone,2026-09-15,11:30,61.5,12.9395,77.5950,Noise spike observed due to emergency ambulance sirens and nearby road drilling.
+St. Joseph High School,Silence Zone,2026-09-15,13:00,48.7,12.9730,77.6040,School perimeter monitoring during afternoon study hours.
+Brigade Gateway Residency,Residential,2026-09-16,07:45,51.2,13.0118,77.5552,Early morning neighborhood acoustic check. Very calm and compliant.
+Koramangala 4th Block,Residential,2026-09-16,21:15,72.4,12.9340,77.6280,Late evening violation caused by open-air restaurant music speakers.
+Indiranagar 100ft Road,Commercial,2026-09-16,14:30,64.1,12.9784,77.6408,Afternoon commercial district traffic and shopping crowd. Compliant.
+MG Road Metro Promenade,Commercial,2026-09-16,19:00,81.3,12.9756,77.6066,Heavy vehicle congestion and metro construction machinery exceedance.
+Whitefield IT Export Park,Commercial,2026-09-17,10:00,59.8,12.9850,77.7310,Corporate tech park internal zone. Controlled low acoustic impact.
+Peenya Industrial Area Stage 2,Industrial,2026-09-17,11:45,74.2,13.0280,77.5180,Forging and CNC machining facility operations within permissible ceiling.
+Bommasandra Heavy Engineering Park,Industrial,2026-09-17,15:30,88.6,12.8160,77.6780,High-tonnage stamping press operation exceeded statutory industrial limits.
+Victoria Hospital Campus,Silence Zone,2026-09-18,09:10,47.9,12.9635,77.5740,Regular hospital perimeter surveillance check.
+Jayanagar 4th T Block,Residential,2026-09-18,17:20,53.8,12.9240,77.5830,Residential park vicinity monitoring. Clean green buffer zone.
+Commercial Street Market,Commercial,2026-09-18,16:45,78.9,12.9822,77.6083,High-density festive shopping crowd and street vendor audio amplifiers.
+Electronic City Phase 1,Commercial,2026-09-18,12:15,62.5,12.8450,77.6600,Electronics campus perimeter. Optimal compliance levels.
+Veerasandra Industrial Corridor,Industrial,2026-09-18,14:00,73.1,12.8350,77.6710,Foundry emissions and machine floor acoustics within permitted limit.

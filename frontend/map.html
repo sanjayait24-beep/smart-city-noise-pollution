@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spatial Mapping &amp; Acoustic Hotspots | Smart City Noise System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    #mainMap {
+      height: calc(100vh - 150px);
+      width: 100%;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+    }
+    .map-sidebar {
+      height: calc(100vh - 150px);
+      overflow-y: auto;
+    }
+    .location-list-item {
+      cursor: pointer;
+      padding: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.2s ease;
+    }
+    .location-list-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .location-list-item.active {
+      background: rgba(99, 102, 241, 0.15);
+      border-left: 3px solid #6366f1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="app-navbar d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <a href="dashboard.html" class="nav-brand">
+      <div class="nav-brand-logo">
+        <i class="bi bi-soundwave"></i>
+      </div>
+      <div class="nav-brand-text">
+        <h1>Smart City Noise Spatial Monitor</h1>
+        <span>Compliance Tracking System</span>
+      </div>
+    </a>
+
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+      <a href="add-noise.html" class="nav-link-item"><i class="bi bi-plus-circle"></i> Add Noise Data</a>
+      <a href="records.html" class="nav-link-item"><i class="bi bi-table"></i> Noise Records</a>
+      <a href="map.html" class="nav-link-item active"><i class="bi bi-geo-alt"></i> Spatial Map</a>
+      <a href="reports.html" class="nav-link-item"><i class="bi bi-bar-chart"></i> Reports</a>
+    </div>
+
+    <div id="navbarUserContainer" class="d-flex align-items-center"></div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container-fluid px-4 py-3">
+
+    <!-- Top Sub-bar -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <div>
+        <h4 class="mb-0 fw-bold">Geographic Spatial Mapping &amp; Hotspot Surveillance</h4>
+        <span class="text-muted small">Real-time geographic distribution of smart city noise monitoring points</span>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-success py-2 px-3"><i class="bi bi-shield-check me-1"></i> <span id="mapSafeCount">--</span> Safe</span>
+        <span class="badge bg-danger py-2 px-3"><i class="bi bi-exclamation-triangle me-1"></i> <span id="mapViolationCount">--</span> Non-Compliant</span>
+        <button id="recenterBtn" class="btn btn-sm btn-cyber-secondary" title="Recenter View">
+          <i class="bi bi-crosshair"></i> Recenter
+        </button>
+      </div>
+    </div>
+
+    <!-- Map & Sidebar Row -->
+    <div class="row g-3">
+      
+      <!-- Left: Locations List & Filter Sidebar -->
+      <div class="col-12 col-lg-4 col-xl-3">
+        <div class="glass-panel p-3 map-sidebar d-flex flex-column">
+          
+          <!-- Search & Filter Controls -->
+          <div class="mb-3">
+            <label class="form-label small mb-1">Search Map Locations</label>
+            <div class="input-group input-group-sm mb-2">
+              <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
+              <input type="text" id="mapSearchInput" class="form-control" placeholder="Type location name...">
+            </div>
+
+            <!-- Zone Filter Buttons -->
+            <div class="d-flex flex-wrap gap-1">
+              <button class="btn btn-sm btn-cyber-primary py-0 px-2 active" data-zone="ALL" style="font-size:0.75rem;">All</button>
+              <button class="btn btn-sm btn-cyber-secondary py-0 px-2" data-zone="Silence Zone" style="font-size:0.75rem;">Silence</button>
+              <button class="btn btn-sm btn-cyber-secondary py-0 px-2" data-zone="Residential" style="font-size:0.75rem;">Residential</button>
+              <button class="btn btn-sm btn-cyber-secondary py-0 px-2" data-zone="Commercial" style="font-size:0.75rem;">Commercial</button>
+              <button class="btn btn-sm btn-cyber-secondary py-0 px-2" data-zone="Industrial" style="font-size:0.75rem;">Industrial</button>
+              <button class="btn btn-sm btn-outline-danger py-0 px-2" data-zone="VIOLATIONS" style="font-size:0.75rem;">Violations</button>
+            </div>
+          </div>
+
+          <!-- Locations List -->
+          <div class="flex-grow-1 overflow-auto" id="locationListContainer">
+            <div class="text-center py-4 text-muted small">Loading locations...</div>
+          </div>
+
+          <!-- Legend -->
+          <div class="border-top border-secondary pt-2 mt-2 small text-muted">
+            <div class="d-flex justify-content-between mb-1">
+              <span><span class="badge bg-success me-1">●</span> Compliant</span>
+              <span><span class="badge bg-danger me-1">●</span> Exceeded (Pulsing)</span>
+            </div>
+            <div class="text-dim" style="font-size: 0.72rem;">Click on any location to center &amp; open its details.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right: Main Spatial Map -->
+      <div class="col-12 col-lg-8 col-xl-9">
+        <div class="glass-panel p-2 position-relative">
+          <div id="mainMap"></div>
+
+          <!-- Fallback Visual City Grid (shown if offline) -->
+          <div id="offlineFallbackNotice" class="position-absolute bottom-0 start-0 m-3 p-2 bg-dark rounded border border-secondary small text-muted d-none" style="z-index: 1000;">
+            <i class="bi bi-info-circle text-cyan me-1"></i> Interactive Spatial City Map Mode
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Application Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>

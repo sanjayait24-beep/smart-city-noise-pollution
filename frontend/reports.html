@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acoustic Reports &amp; Compliance Audit | Smart City Noise System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    @media print {
+      .app-navbar, .no-print, .btn { display: none !important; }
+      body { background: #fff !important; color: #000 !important; }
+      .glass-panel { background: #fff !important; border: 1px solid #ccc !important; box-shadow: none !important; color: #000 !important; }
+      h1, h2, h3, h4, h5, strong, span, td, th { color: #000 !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="app-navbar d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <a href="dashboard.html" class="nav-brand">
+      <div class="nav-brand-logo">
+        <i class="bi bi-soundwave"></i>
+      </div>
+      <div class="nav-brand-text">
+        <h1>Smart City Noise Spatial Monitor</h1>
+        <span>Compliance Tracking System</span>
+      </div>
+    </a>
+
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+      <a href="add-noise.html" class="nav-link-item"><i class="bi bi-plus-circle"></i> Add Noise Data</a>
+      <a href="records.html" class="nav-link-item"><i class="bi bi-table"></i> Noise Records</a>
+      <a href="map.html" class="nav-link-item"><i class="bi bi-geo-alt"></i> Spatial Map</a>
+      <a href="reports.html" class="nav-link-item active"><i class="bi bi-bar-chart"></i> Reports</a>
+    </div>
+
+    <div id="navbarUserContainer" class="d-flex align-items-center"></div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container-fluid px-4 py-4">
+
+    <!-- Header & Action Bar -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+      <div>
+        <h3 class="mb-1 fw-bold">Statutory Acoustic Audit &amp; Analytical Reports</h3>
+        <p class="text-muted small mb-0">Official smart city noise pollution compliance analysis and zone threshold governance</p>
+      </div>
+      <div class="d-flex gap-2 no-print">
+        <button id="printReportBtn" class="btn btn-cyber-secondary">
+          <i class="bi bi-printer"></i> Print Audit Report
+        </button>
+        <button id="refreshReportBtn" class="btn btn-cyber-primary">
+          <i class="bi bi-arrow-clockwise"></i> Refresh Analytics
+        </button>
+      </div>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="reportAlert" class="alert d-none py-2 px-3 mb-4" role="alert"></div>
+
+    <!-- Row 1: Charts (Safe vs Non-Safe Distribution & Zone-wise Breakdown) -->
+    <div class="row g-4 mb-4">
+      
+      <!-- Safe vs Non-Safe Ratio -->
+      <div class="col-12 col-md-5 col-xl-4">
+        <div class="glass-panel p-4 h-100 d-flex flex-column">
+          <h5 class="fs-6 mb-3"><i class="bi bi-shield-check text-cyan me-2"></i>City Compliance Ratio</h5>
+          <div class="flex-grow-1 position-relative d-flex align-items-center justify-content-center" style="min-height: 250px;">
+            <canvas id="reportComplianceDonut"></canvas>
+          </div>
+          <div class="p-3 bg-dark rounded border border-secondary mt-3 small">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted">Compliant Sites:</span>
+              <strong id="repSafeCount" class="text-safe">--</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted">Violating Hotspots:</span>
+              <strong id="repViolationCount" class="text-danger">--</strong>
+            </div>
+            <div class="d-flex justify-content-between border-top border-secondary pt-1">
+              <span class="text-muted">Statutory Adherence:</span>
+              <strong id="repAdherencePercent" class="text-light">--%</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone Comparison Bar Chart -->
+      <div class="col-12 col-md-7 col-xl-8">
+        <div class="glass-panel p-4 h-100 d-flex flex-column">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fs-6 mb-0"><i class="bi bi-bar-chart-fill text-cyan me-2"></i>Zone-wise Mean Noise vs Statutory Ceiling</h5>
+            <span class="badge bg-secondary">CPCB Standards</span>
+          </div>
+          <div class="flex-grow-1 position-relative" style="min-height: 280px;">
+            <canvas id="reportZoneChart"></canvas>
+          </div>
+          <div class="text-muted small text-center mt-2">
+            Comparison between recorded average decibels and maximum permissible limits.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 2: Daily Trends Chart -->
+    <div class="row g-4 mb-4">
+      <div class="col-12">
+        <div class="glass-panel p-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fs-6 mb-0"><i class="bi bi-graph-up text-cyan me-2"></i>Chronological Daily Acoustic Footprint</h5>
+            <span class="badge bg-secondary">Day-to-Day Trends</span>
+          </div>
+          <div style="height: 280px;" class="position-relative">
+            <canvas id="reportDailyTrendChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Top 5 Highest Noise Violations Table -->
+    <div class="row g-4 mb-4">
+      <div class="col-12 col-xl-6">
+        <div class="glass-panel p-4 h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fs-6 mb-0 text-danger"><i class="bi bi-fire me-2"></i>Top 5 Loudest City Hotspots</h5>
+            <span class="badge bg-danger">Critical Violations</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table-cyber">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Location</th>
+                  <th>Zone</th>
+                  <th>Peak dB</th>
+                  <th>Limit</th>
+                  <th>Exceedance</th>
+                </tr>
+              </thead>
+              <tbody id="topViolationsTableBody">
+                <tr><td colspan="6" class="text-center py-4 text-muted">Loading top violations...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configurable Zone Limits Table -->
+      <div class="col-12 col-xl-6">
+        <div class="glass-panel p-4 h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fs-6 mb-0 text-light"><i class="bi bi-sliders text-cyan me-2"></i>Configurable Statutory Zone Thresholds</h5>
+            <span class="badge bg-secondary">Dynamic Database Limits</span>
+          </div>
+          <p class="text-muted small mb-3">These thresholds govern the automated compliance engine. Limits are fully editable via the database.</p>
+          <div class="table-responsive">
+            <table class="table-cyber">
+              <thead>
+                <tr>
+                  <th>Zone Type</th>
+                  <th>Day Limit (06-22h)</th>
+                  <th>Night Limit (22-06h)</th>
+                  <th>Baseline</th>
+                  <th class="no-print" style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="zoneLimitsTableBody">
+                <tr><td colspan="5" class="text-center py-4 text-muted">Loading zone limits...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Edit Zone Limit Modal -->
+  <div class="modal fade" id="editLimitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content cyber-modal">
+        <div class="modal-header cyber-modal-header">
+          <h5 class="modal-title"><i class="bi bi-sliders text-cyan me-2"></i>Update Zone Noise Threshold</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editLimitForm">
+          <div class="modal-body">
+            <input type="hidden" id="editLimitId">
+            <div class="mb-3">
+              <label class="form-label">Zone Category</label>
+              <input type="text" class="form-control" id="editLimitZoneType" readonly>
+            </div>
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label for="editDayLimit" class="form-label">Day Limit (dB)</label>
+                <input type="number" step="0.5" class="form-control" id="editDayLimit" required>
+              </div>
+              <div class="col-6">
+                <label for="editNightLimit" class="form-label">Night Limit (dB)</label>
+                <input type="number" step="0.5" class="form-control" id="editNightLimit" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editStandardLimit" class="form-label">Standard Baseline Limit (dB)</label>
+              <input type="number" step="0.5" class="form-control" id="editStandardLimit" required>
+            </div>
+            <div class="mb-2">
+              <label for="editLimitDesc" class="form-label">Description / Legal Clause</label>
+              <textarea class="form-control" id="editLimitDesc" rows="2"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer cyber-modal-footer">
+            <button type="button" class="btn btn-cyber-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-cyber-primary">Save Threshold</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Application Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/reports.js"></script>
+</body>
+</html>

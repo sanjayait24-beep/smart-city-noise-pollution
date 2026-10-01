@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal | Smart City Noise Pollution System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="d-flex align-items-center justify-content-center min-vh-100 py-4">
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-5">
+        
+        <!-- Header Brand -->
+        <div class="text-center mb-4">
+          <div class="nav-brand-logo mx-auto mb-3" style="width: 58px; height: 58px; font-size: 1.8rem;">
+            <i class="bi bi-soundwave"></i>
+          </div>
+          <h2 class="fw-bold mb-1">Smart City Noise Monitor</h2>
+          <p class="text-muted small">Spatial Mapping System &amp; Statutory Compliance Tracking</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="glass-panel p-4 p-md-5">
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="mb-0 fs-5"><i class="bi bi-shield-lock me-2 text-cyan"></i>Admin Authentication</h4>
+            <span class="badge bg-secondary">System Access</span>
+          </div>
+
+          <div id="alertBox" class="alert alert-danger d-none py-2 px-3 small" role="alert"></div>
+
+          <form id="loginForm" autocomplete="off">
+            <div class="mb-3">
+              <label for="username" class="form-label">Admin Username</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" id="username" placeholder="Enter username (e.g., admin)" required autofocus>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-key"></i></span>
+                <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+              </div>
+            </div>
+
+            <button type="submit" id="loginSubmitBtn" class="btn btn-cyber-primary w-100 justify-content-center py-2 mb-3">
+              <i class="bi bi-box-arrow-in-right"></i> Sign In to Dashboard
+            </button>
+
+            <!-- Quick Demo Helper -->
+            <button type="button" id="fillDemoBtn" class="btn btn-cyber-secondary w-100 justify-content-center py-2 text-muted small">
+              <i class="bi bi-magic me-1"></i> Quick Fill Demo Credentials (admin / admin123)
+            </button>
+          </form>
+
+          <div class="border-top border-secondary mt-4 pt-3 text-center">
+            <span class="text-dim small"><i class="bi bi-info-circle me-1"></i>No physical IoT sensors required. Manual &amp; CSV dataset driven.</span>
+          </div>
+        </div>
+
+        <div class="text-center mt-3 text-dim small">
+          Academic Mini Project | 3rd Year Information Technology
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // If already logged in, redirect directly to dashboard
+      if (Auth.isLoggedIn()) {
+        window.location.href = 'dashboard.html';
+      }
+
+      const form = document.getElementById('loginForm');
+      const alertBox = document.getElementById('alertBox');
+      const fillDemoBtn = document.getElementById('fillDemoBtn');
+
+      fillDemoBtn.addEventListener('click', () => {
+        document.getElementById('username').value = 'admin';
+        document.getElementById('password').value = 'admin123';
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertBox.classList.add('d-none');
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        const submitBtn = document.getElementById('loginSubmitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
+
+        try {
+          const resp = await API.login(username, password);
+          if (resp.success && resp.data && resp.data.authenticated) {
+            Auth.saveSession(resp.data);
+            window.location.href = 'dashboard.html';
+          } else {
+            alertBox.textContent = resp.message || 'Invalid username or password';
+            alertBox.classList.remove('d-none');
+          }
+        } catch (err) {
+          alertBox.textContent = 'Connection error. Ensure the Spring Boot backend is running on port 8080.';
+          alertBox.classList.remove('d-none');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Sign In to Dashboard';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noise Records Management | Smart City Noise System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <!-- Custom Design System -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="app-navbar d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <a href="dashboard.html" class="nav-brand">
+      <div class="nav-brand-logo">
+        <i class="bi bi-soundwave"></i>
+      </div>
+      <div class="nav-brand-text">
+        <h1>Smart City Noise Spatial Monitor</h1>
+        <span>Compliance Tracking System</span>
+      </div>
+    </a>
+
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link-item"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+      <a href="add-noise.html" class="nav-link-item"><i class="bi bi-plus-circle"></i> Add Noise Data</a>
+      <a href="records.html" class="nav-link-item active"><i class="bi bi-table"></i> Noise Records</a>
+      <a href="map.html" class="nav-link-item"><i class="bi bi-geo-alt"></i> Spatial Map</a>
+      <a href="reports.html" class="nav-link-item"><i class="bi bi-bar-chart"></i> Reports</a>
+    </div>
+
+    <div id="navbarUserContainer" class="d-flex align-items-center"></div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container-fluid px-4 py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+      <div>
+        <h3 class="mb-1 fw-bold">Noise Monitoring Records Directory</h3>
+        <p class="text-muted small mb-0">Search, filter, inspect, edit, and audit historical city acoustic inspection logs</p>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="add-noise.html" class="btn btn-cyber-primary">
+          <i class="bi bi-plus-lg"></i> Add New Record
+        </a>
+        <button id="exportCsvBtn" class="btn btn-cyber-secondary">
+          <i class="bi bi-download"></i> Export Filtered CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Alert / Toast Messages -->
+    <div id="recordsAlert" class="alert d-none py-2 px-3 mb-4" role="alert"></div>
+
+    <!-- Filters Bar -->
+    <div class="glass-panel p-3 mb-4">
+      <div class="row g-2 align-items-end">
+        
+        <!-- Search Keyword -->
+        <div class="col-12 col-md-3">
+          <label class="form-label small mb-1">Search Location / Notes</label>
+          <div class="input-group">
+            <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
+            <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search by name, landmark...">
+          </div>
+        </div>
+
+        <!-- Zone Type Filter -->
+        <div class="col-6 col-md-2">
+          <label class="form-label small mb-1">Zone Type</label>
+          <select id="zoneFilter" class="form-select form-select-sm">
+            <option value="">All Zones</option>
+            <option value="Silence Zone">Silence Zone</option>
+            <option value="Residential">Residential</option>
+            <option value="Commercial">Commercial</option>
+            <option value="Industrial">Industrial</option>
+          </select>
+        </div>
+
+        <!-- Compliance Filter -->
+        <div class="col-6 col-md-2">
+          <label class="form-label small mb-1">Compliance</label>
+          <select id="complianceFilter" class="form-select form-select-sm">
+            <option value="">All Statuses</option>
+            <option value="SAFE">SAFE / Compliant</option>
+            <option value="NON_COMPLIANT">NON-COMPLIANT</option>
+          </select>
+        </div>
+
+        <!-- Date Range: Start -->
+        <div class="col-6 col-md-2">
+          <label class="form-label small mb-1">From Date</label>
+          <input type="date" id="startDateFilter" class="form-control form-control-sm">
+        </div>
+
+        <!-- Date Range: End -->
+        <div class="col-6 col-md-2">
+          <label class="form-label small mb-1">To Date</label>
+          <input type="date" id="endDateFilter" class="form-control form-control-sm">
+        </div>
+
+        <!-- Filter Reset & Trigger -->
+        <div class="col-12 col-md-1 d-flex gap-1">
+          <button id="resetFiltersBtn" class="btn btn-sm btn-cyber-secondary w-100" title="Reset Filters">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Records Table Panel -->
+    <div class="glass-panel p-3">
+      <div class="d-flex align-items-center justify-content-between mb-3 px-2">
+        <span class="small text-muted" id="recordCountDisplay">Showing -- records</span>
+        <div class="small text-dim">
+          <span class="badge bg-success me-1">●</span> Compliant
+          <span class="badge bg-danger ms-2 me-1">●</span> Exceeded
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table-cyber" id="recordsTable">
+          <thead>
+            <tr>
+              <th style="width: 50px;">ID</th>
+              <th>Location</th>
+              <th>Zone</th>
+              <th>Noise Level</th>
+              <th>Permitted Limit</th>
+              <th>Exceedance</th>
+              <th>Date &amp; Time</th>
+              <th>Compliance Status</th>
+              <th>Description</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTableBody">
+            <tr><td colspan="10" class="text-center py-5 text-muted">Loading records...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Edit Record Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content cyber-modal">
+        <div class="modal-header cyber-modal-header">
+          <h5 class="modal-title" id="editModalLabel"><i class="bi bi-pencil-square text-cyan me-2"></i>Edit Noise Record</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editRecordForm">
+          <div class="modal-body">
+            <input type="hidden" id="editRecordId">
+
+            <div class="mb-3">
+              <label for="editLocationName" class="form-label">Location Name</label>
+              <input type="text" class="form-control" id="editLocationName" required>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label for="editZoneType" class="form-label">Zone</label>
+                <select class="form-select" id="editZoneType" required>
+                  <option value="Silence Zone">Silence Zone</option>
+                  <option value="Residential">Residential</option>
+                  <option value="Commercial">Commercial</option>
+                  <option value="Industrial">Industrial</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label for="editNoiseLevel" class="form-label">Noise Level (dB)</label>
+                <input type="number" step="0.1" min="20" max="150" class="form-control" id="editNoiseLevel" required>
+              </div>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label for="editDate" class="form-label">Date</label>
+                <input type="date" class="form-control" id="editDate" required>
+              </div>
+              <div class="col-6">
+                <label for="editTime" class="form-label">Time</label>
+                <input type="time" class="form-control" id="editTime" required>
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label for="editDescription" class="form-label">Description / Remarks</label>
+              <textarea class="form-control" id="editDescription" rows="2"></textarea>
+            </div>
+
+            <div class="small text-muted">
+              * Note: System will automatically recalculate statutory compliance status upon save.
+            </div>
+          </div>
+          <div class="modal-footer cyber-modal-footer">
+            <button type="button" class="btn btn-cyber-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-cyber-primary">Update Record</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content cyber-modal">
+        <div class="modal-header cyber-modal-header border-danger">
+          <h6 class="modal-title text-danger" id="deleteModalLabel"><i class="bi bi-trash3 me-2"></i>Confirm Delete</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-3">
+          <p class="small mb-0">Are you sure you want to permanently delete record <strong id="deleteRecordTitle" class="text-light"></strong>?</p>
+        </div>
+        <div class="modal-footer cyber-modal-footer">
+          <button type="button" class="btn btn-sm btn-cyber-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" id="confirmDeleteBtn" class="btn btn-sm btn-cyber-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Application Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/records.js"></script>
+</body>
+</html>
